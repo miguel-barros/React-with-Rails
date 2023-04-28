@@ -41,8 +41,8 @@ export default function Todo() {
                             )}</td>
                             <td>
                                 <div className='flex items-center justify-center'>
-                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl'>Edit</button>
-                                    <button className='text-red-500 border border-red-500  py-1 px-6 text-sm rounded-xl ml-2'>Del</button>
+                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white'>Edit</button>
+                                    <button className='text-red-500 border border-red-500  py-1 px-6 text-sm rounded-xl ml-2 hover:bg-red-500 transition ease-in hover:text-white'>Del</button>
                                 </div>
                             </td>
                         </tr>
