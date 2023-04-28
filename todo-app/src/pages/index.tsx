@@ -4,13 +4,13 @@ import React from 'react'
 
 export default function Index() {
   return (
-    <div>
+    <div className='flex items-center justify-center'>
       <Head>
         <title>Todo App</title>
       </Head>
-      <h1>This is a Todo app for testing the Ruby on Rails API integration CRUD</h1>
-      <main>
-        <p>Your to-do list is:</p>
+      <main className='w-full rounded-lg flex items-center justify-center flex-col mt-10'>
+        <h1 className='text-4xl font-bold'>ToDo list app</h1>
+        <p className='text-sm text-gray-700'>Your to-do list is:</p>
         <Todo />
       </main>
     </div>
