@@ -3,8 +3,8 @@ import axios from 'axios'
 const API_URL = 'http://localhost:3000/todos'
 
 interface Todo {
-    id: number,
-    title: string,
+    id?: number,
+    name: string,
     description: string,
     status: boolean
 }
@@ -21,6 +21,7 @@ export default class TodoController {
     }
     
     static async create(todo: Todo) {
+        if (!todo.name || todo.name == '' || !todo.description || todo.description == '') return false
         const response = await axios.post(API_URL, todo)
         return response.data
     }
