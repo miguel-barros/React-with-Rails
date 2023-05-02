@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Icon } from '@iconify/react';
 import { Alert } from '@mui/material';
+
 import TodoController from '@/controller/todoController';
 
 export default function Todo() {
     const [todos, setTodos] = useState([])
     const [refresh, setRefresh] = useState(false)
     const [alert, setAlert] = useState({ show: false, type: 'success', message: '' })
+
+    const nameInput = useRef()
+    const descriptionInput = useRef()
+    const inputButton = useRef()
 
     const [newTodo, setNewTodo] = useState({ name: '', description: '', status: false })
 
@@ -21,7 +26,7 @@ export default function Todo() {
         }
     }
 
-    const createTodo = (todo: any) => {
+    const handleCreate = (todo: any) => {
         if (todo.name === '') {
             setAlert({ show: true, type: 'error', message: 'Name is required' })
             return
@@ -39,6 +44,16 @@ export default function Todo() {
         }
     }
 
+    const handleEdit = (todo: any) => {
+        const name = nameInput.current
+        const description = descriptionInput.current
+        const button = inputButton.current
+
+        name.value = todo.name
+        description.value = todo.description
+        button.innerHTML = 'Update'
+    }
+
     useEffect(() => {
         getTodos()
     }, [refresh])
@@ -46,11 +61,12 @@ export default function Todo() {
     return (
         <div className='w-full h-full mt-5 flex items-center flex-col'>
             <div className='w-7/12 flex items-center justify-between mb-5'>
-                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-6/12 mr-3 outline-none' placeholder='New todo name' onChange={(e) => setNewTodo({ ...newTodo, name: e.target.value })} value={newTodo.name} />
-                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-full mr-3 outline-none' placeholder='New todo description' onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })} value={newTodo.description} />
-                <button className='text-white bg-green-500 py-1 px-6 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => createTodo(newTodo)}>Create</button>
+                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-6/12 mr-3 outline-none' placeholder='New todo name' onChange={(e) => setNewTodo({ ...newTodo, name: e.target.value })} value={newTodo.name} ref={nameInput} />
+                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-full mr-3 outline-none' placeholder='New todo description' onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })} value={newTodo.description} ref={descriptionInput} />
+                <button className='text-white bg-green-500 py-1 px-6 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => handleCreate(newTodo)} ref={inputButton} >Create</button>
             </div>
             {alert.show && <Alert severity={alert.type} onClose={() => setAlert({ ...alert, show: false })} >{alert.message}</Alert>}
+            {todos.length === 0 && <p className='text-md text-gray-400'>No todo found</p>}
             <table className='w-10/12'>
                 <thead className='text-sm border-b-2 border-[#2b2b2b]'>
                     <tr className=''>
@@ -85,7 +101,7 @@ export default function Todo() {
 
                             <td>
                                 <div className='flex items-center justify-center'>
-                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white' onClick={() => { }}>Edit</button>
+                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white' onClick={() => handleEdit(todo)}>Edit</button>
                                     <button className='text-red-500 border border-red-500  py-1 px-6 text-sm rounded-xl ml-2 hover:bg-red-500 transition ease-in hover:text-white' onClick={() => {
                                         TodoController.delete(todo.id).then((res) => {
                                             if (res) {
