@@ -93,6 +93,14 @@ export default function Todo() {
         setNewTodo({ ...todo, id: todo.id })
     }
 
+    const handleClear = async () => {
+        setNewTodo({
+            name: '',
+            description: '',
+            status: false
+        })
+    }
+
     useEffect(() => {
         getTodos()
     }, [refresh])
@@ -102,7 +110,8 @@ export default function Todo() {
             <div className='w-7/12 flex items-center justify-between mb-5'>
                 <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-6/12 mr-3 outline-none' placeholder='New todo name' onChange={(e) => setNewTodo({ ...newTodo, name: e.target.value })} value={newTodo.name} />
                 <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-full mr-3 outline-none' placeholder='New todo description' onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })} value={newTodo.description} />
-                <button className='text-white bg-green-500 py-1 px-6 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => verifyButton(newTodo)} id={"btn-edit"} >Create</button>
+                <button className='text-white bg-green-500 py-1 px-6 mr-3 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => verifyButton(newTodo)} id={"btn-edit"} >Create</button>
+                <button disabled={newTodo.name === '' && newTodo.description === '' ? true : false} className='text-white bg-red-600 py-1 px-6 text-sm rounded-xl hover:bg-red-700 transition ease-in disabled:bg-opacity-50 disabled:hover:bg-opacity-60 disabled:text-opacity-50' onClick={() => handleClear()}>Cancel</button>
             </div>
             {alert.show && <Alert severity={alert.type} onClose={() => setAlert({ ...alert, show: false })} >{alert.message}</Alert>}
             {todos.length === 0 && <p className='text-md text-gray-400'>No todo found</p>}
@@ -140,7 +149,7 @@ export default function Todo() {
 
                             <td>
                                 <div className='flex items-center justify-center'>
-                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white' onClick={() => handleEdit(todo)
+                                    <button disabled={(todo.status) ? true : false} className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white disabled:opacity-50 disabled:hover:bg-[#131516] disabled:hover:text-yellow-700' onClick={() => handleEdit(todo)
                                     }>Edit</button>
                                     <button className='text-red-500 border border-red-500  py-1 px-6 text-sm rounded-xl ml-2 hover:bg-red-500 transition ease-in hover:text-white' onClick={() => {
                                         TodoController.delete(todo.id).then((res) => {
