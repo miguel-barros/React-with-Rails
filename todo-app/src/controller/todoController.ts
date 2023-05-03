@@ -27,6 +27,7 @@ export default class TodoController {
     }
     
     static async update(todo: Todo) {
+        if (!todo.id || !todo.name || todo.name == '' || !todo.description || todo.description == '') return false
         const response = await axios.put(`${API_URL}/${todo.id}`, todo)
         return response.data
     }

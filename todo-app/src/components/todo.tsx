@@ -9,10 +9,6 @@ export default function Todo() {
     const [refresh, setRefresh] = useState(false)
     const [alert, setAlert] = useState({ show: false, type: 'success', message: '' })
 
-    const nameInput = useRef()
-    const descriptionInput = useRef()
-    const inputButton = useRef()
-
     const [newTodo, setNewTodo] = useState({ name: '', description: '', status: false })
 
     const getTodos = async () => {
@@ -26,32 +22,75 @@ export default function Todo() {
         }
     }
 
-    const handleCreate = (todo: any) => {
-        if (todo.name === '') {
-            setAlert({ show: true, type: 'error', message: 'Name is required' })
-            return
-        } else if (todo.description === '') {
-            setAlert({ show: true, type: 'error', message: 'Description is required' })
-            return
-        } else {
-            TodoController.create(todo).then((res) => {
-                if (res) {
-                    setAlert({ show: true, type: 'success', message: 'Todo has been created!' })
-                    setRefresh(!refresh)
-                }
-            }
-            )
+    const verifyButton = async (todo: any) => {
+        const btn = document.getElementById('btn-edit')
+        if (!btn) return false
+        if (btn.innerText === 'Create') {
+            handleCreate(todo)
+        } else if (btn.innerText === 'Update') {
+            handleUpdate(todo)
         }
     }
 
-    const handleEdit = (todo: any) => {
-        const name = nameInput.current
-        const description = descriptionInput.current
-        const button = inputButton.current
+    const verifyParams = (todo: any) => {
+        if (!todo.name || !todo.name.trim()) {
+            setAlert({ show: true, type: 'error', message: 'Name is required' })
+            return false
+        } else if (!todo.description || !todo.description.trim()) {
+            setAlert({ show: true, type: 'error', message: 'Description is required' })
+            return false
+        } else {
+            return true
+        }
+    }
 
-        name.value = todo.name
-        description.value = todo.description
-        button.innerHTML = 'Update'
+    const handleCreate = async (todo: any) => {
+        if (!verifyParams(todo)) return false
+        const btn = document.getElementById('btn-edit')
+        if (!btn) return false
+        TodoController.create(todo).then((res) => {
+            if (!res) return false
+            setAlert({ show: true, type: 'success', message: 'Create has been success' })
+            setRefresh(!refresh)
+            setNewTodo({
+                name: '',
+                description: '',
+                status: false
+            })
+        }).catch((err) => {
+            setAlert({ show: true, type: 'error', message: err.message })
+        })
+    }
+
+    const handleUpdate = async (todo: any) => {
+        if (!verifyParams(todo)) return false
+        const btn = document.getElementById('btn-edit')
+        if (!btn) return false
+        TodoController.update(todo).then((res) => {
+            if (!res) return false
+            setAlert({ show: true, type: 'success', message: 'Update has been success' })
+            setRefresh(!refresh)
+            setNewTodo({
+                name: '',
+                description: '',
+                status: false
+            })
+            btn.innerText = 'Create'
+        }).catch((err) => {
+            setAlert({ show: true, type: 'error', message: err.message })
+        })
+    }
+
+    const handleEdit = async (todo: any) => {
+        const btn = document.getElementById('btn-edit')
+        if (!btn) return false
+        btn.innerText = 'Update'
+        setNewTodo({
+            name: todo.name,
+            description: todo.description,
+            status: todo.status
+        })
+        setNewTodo({ ...todo, id: todo.id })
     }
 
     useEffect(() => {
@@ -61,9 +100,9 @@ export default function Todo() {
     return (
         <div className='w-full h-full mt-5 flex items-center flex-col'>
             <div className='w-7/12 flex items-center justify-between mb-5'>
-                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-6/12 mr-3 outline-none' placeholder='New todo name' onChange={(e) => setNewTodo({ ...newTodo, name: e.target.value })} value={newTodo.name} ref={nameInput} />
-                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-full mr-3 outline-none' placeholder='New todo description' onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })} value={newTodo.description} ref={descriptionInput} />
-                <button className='text-white bg-green-500 py-1 px-6 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => handleCreate(newTodo)} ref={inputButton} >Create</button>
+                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-6/12 mr-3 outline-none' placeholder='New todo name' onChange={(e) => setNewTodo({ ...newTodo, name: e.target.value })} value={newTodo.name} />
+                <input type="text" className='bg-[#2b2b2b] rounded-xl py-1 px-4 w-full mr-3 outline-none' placeholder='New todo description' onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })} value={newTodo.description} />
+                <button className='text-white bg-green-500 py-1 px-6 text-sm rounded-xl hover:bg-green-600 transition ease-in' onClick={() => verifyButton(newTodo)} id={"btn-edit"} >Create</button>
             </div>
             {alert.show && <Alert severity={alert.type} onClose={() => setAlert({ ...alert, show: false })} >{alert.message}</Alert>}
             {todos.length === 0 && <p className='text-md text-gray-400'>No todo found</p>}
@@ -101,7 +140,8 @@ export default function Todo() {
 
                             <td>
                                 <div className='flex items-center justify-center'>
-                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white' onClick={() => handleEdit(todo)}>Edit</button>
+                                    <button className='text-yellow-700 border border-yellow-500 py-1 px-6 text-sm rounded-xl hover:bg-yellow-500 transition ease-in hover:text-white' onClick={() => handleEdit(todo)
+                                    }>Edit</button>
                                     <button className='text-red-500 border border-red-500  py-1 px-6 text-sm rounded-xl ml-2 hover:bg-red-500 transition ease-in hover:text-white' onClick={() => {
                                         TodoController.delete(todo.id).then((res) => {
                                             if (res) {
